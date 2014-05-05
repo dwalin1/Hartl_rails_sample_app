@@ -1,5 +1,6 @@
 class UsersController < ApplicationController
   before_action :signed_in_user, only: [:index, :edit, :update, :destroy]
+  before_action :signed_out_user, only: [:new, :create]
   before_action :correct_user,   only: [:edit, :update]
   before_action :admin_user,     only: :destroy
   
@@ -16,7 +17,7 @@ class UsersController < ApplicationController
   end
   
   def create
-    @user = User.new(user_params)    # Not the final implementation!
+    @user = User.new(user_params)    
     if @user.save
       sign_in @user
       flash[:success] = "Welcome to the Sample App!"
@@ -59,7 +60,13 @@ class UsersController < ApplicationController
       store_location
       redirect_to signin_url, notice: "Please sign in."
     end
-  end  
+  end
+  
+  def signed_out_user
+    if signed_in?
+      redirect_to root_url, {notice: "You already ARE a user!"}
+    end
+  end
   
   def correct_user
     @user = User.find(params[:id])
